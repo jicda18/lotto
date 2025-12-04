@@ -28,7 +28,7 @@
     "env-var": "^7.5.0",
     "ioredis": "^5.8.2",
     "luxon": "^3.7.2",
-    "puppeteer": "^24.31.0",
+    "puppeteer": "^24.32.0",
     "uuid": "^11.1.0",
     "winston": "^3.18.3",
     "yargs": "^18.0.0"
