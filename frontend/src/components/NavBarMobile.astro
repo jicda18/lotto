@@ -1,0 +1,82 @@
+---
+import MoonIcon from '../icons/MoonIcon.astro';
+import SunIcon from '../icons/SunIcon.astro';
+
+type NavItem = { path: string; label: string; children?: undefined };
+interface Props {
+    items: (NavItem | { path?: undefined; label: string; children: NavItem[] })[]
+}
+
+const { items } = Astro.props;
+const currentPath = Astro.url.pathname;
+---
+
+<div id="mobile-menu" class="hidden md:hidden pb-4 border-t border-gray-200 dark:border-gray-700 mt-4 pt-4">
+    <div class="space-y-2">
+        {items.map((item) => !item.children?.length ? (
+            <a
+                href={item.path}
+                class="block px-3 py-2 text-gray-600 dark:text-gray-300 hover:text-primary-900 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors"
+            >
+                { item.label }
+            </a>
+        ) : (
+            <div class="space-y-1">
+                <button 
+                    id={`mobile-${item.label.replace(' ', '-')}-toggle`}
+                    data-child-dropdown={`mobile-${item.label.replace(' ', '-')}-dropdown`}
+                    class="flex items-center justify-between w-full px-3 py-2 text-gray-600 dark:text-gray-300 hover:text-primary-900 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors"
+                >
+                    <span>{ item.label }</span>
+                    <svg id={`mobile-${item.label.replace(' ', '-')}-arrow`} class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+
+                <div id={`mobile-${item.label.replace(' ', '-')}-dropdown`} class="hidden pl-4 space-y-1">
+                    { item.children.map((child) => <a href={child.path} class="block px-3 py-2 text-gray-600 dark:text-gray-300 hover:text-primary-900 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors">{ child.label }</a>) }
+                </div>
+            </div>
+        ))}
+
+        <button 
+          id="mobile-theme-toggle"
+          class="flex items-end gap-2 w-full px-3 py-2 text-gray-600 dark:text-gray-300 hover:text-primary-900 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors"
+          aria-label="Cambiar tema"
+        >
+            <SunIcon id="mobile-sun-icon" class="ml-auto w-5 h-5 hidden dark:block" />
+    
+            <MoonIcon id="mobile-moon-icon" class="ml-auto w-5 h-5 block dark:hidden" />
+        </button>
+    </div>
+</div>
+
+<script>
+    const buttons = document.querySelectorAll("[data-child-dropdown]");
+    const mobileThemeToggle = document.getElementById('mobile-theme-toggle');
+
+    buttons.forEach((button) => {
+        button.addEventListener("click", () => {
+        const dropdownId = (button as HTMLElement).dataset.childDropdown;
+        const arrowId = (button as HTMLElement).dataset.arrow;
+
+        const dropdown = document.getElementById(dropdownId ?? '');
+        const arrow = document.getElementById(arrowId ?? '');
+
+        dropdown?.classList.toggle("hidden");
+        arrow?.classList.toggle("rotate-180");
+        });
+    });
+
+    mobileThemeToggle?.addEventListener('click', () => {
+      const html = document.getElementById('html-root');
+    
+      html?.classList.toggle("dark");
+
+      if (html?.classList.contains("dark")) {
+        localStorage.setItem("theme", "dark");
+      } else {
+        localStorage.setItem("theme", "light");
+      }
+    });
+</script>

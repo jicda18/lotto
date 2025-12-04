@@ -1,0 +1,14 @@
+---
+import { getCollection } from "astro:content";
+import Hero from "./Hero.astro";
+
+const lotteries = await getCollection('lotteries');
+const content = "Consulta los últimos resultados de tus loterías preferidas. Información actualizada, confiable y al instante.";
+---
+
+<Hero content={content} footer={{ label: "Loterías", count: lotteries.length }}>
+  <h1 class="text-4xl lg:text-6xl font-bold mb-6 leading-tight">
+    Resultados de 
+    <span class="text-gold-400 dark:text-gold-300">Loterías</span>
+  </h1>
+</Hero>

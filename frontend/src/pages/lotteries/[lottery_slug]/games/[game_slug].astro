@@ -1,0 +1,123 @@
+---
+import { getCollection } from "astro:content";
+import { z } from "zod";
+import Layout from "../../../../layouts/Layout.astro";
+import Hero from "../../../../components/Hero.astro";
+import type { Result } from "../../../../types/result";
+import SimpleBoloCard from "../../../../components/results/SimpleBoloCard.astro";
+import LastBoloSpecial from "../../../../components/results/LastBoloSpecial.astro";
+import LastTwoBoloSpecial from "../../../../components/results/LastTwoBoloSpecial.astro";
+import PlayMoreEarnMoreBolo from "../../../../components/results/PlayMoreEarnMoreBolo.astro";
+import NewYorkReal from "../../../../components/results/NewYorkReal.astro";
+import NoResult from "../../../../components/results/NoResult.astro";
+
+const { lottery_slug, game_slug } = Astro.params;
+const rawDate = Astro.url.searchParams.get('date');
+
+const dateSchema = z.preprocess((val) => {
+  if (typeof val === "string" && val.length) {
+    const [y, m, d] = val.split("-").map(Number);
+    const dte = new Date(y, m - 1, d); // ← esto crea la fecha en la zona local
+
+    if (isNaN(dte.getTime())) return new Date();
+    return dte > new Date() ? new Date() : dte;
+  }
+  
+  return new Date();
+}, z.date());
+
+const date = dateSchema.parse(rawDate);
+const formattedDate = date.toLocaleString("es", {
+    dateStyle: "full",
+  });
+
+const [lotteries, games] =  await Promise.all([
+    getCollection("lotteries", (lottery) => lottery.data.slug === lottery_slug),
+    getCollection("games", (game) => game.data.slug === game_slug),
+]);
+
+const lottery = lotteries.at(0);
+const game = games.at(0);
+
+if (!lottery || !game || lottery.id !== game.data.lotteryId.id) return new Response(null, { status: 404, statusText: 'Not found' });
+
+const description = `Resultados de ${game.data.name} de la ${lottery.data.name} del ${formattedDate}`;
+const title = `Resultados de ${game.data.name} de la ${lottery.data.name}`;
+
+const dt = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+const url = `${import.meta.env.VITE_OAPI_URL}/games/${game.id}/results/${dt}T00:00:00-04:00`;
+const response = await fetch(url);
+
+if (!response.ok) throw new Error("Can't get results.");
+
+const jsonResponse = (await response.json()) as { success: true, entries: Result | null} | { success: false, error: string };
+
+if (!jsonResponse.success) throw new Error(jsonResponse.error);
+
+const result = jsonResponse.entries;
+
+let CardComponent;
+switch (game.data.resultRenderComponent) {
+  case "LastBoloSpecial":
+    CardComponent = LastBoloSpecial;
+    break;
+
+  case "LastTwoBoloSpecial":
+    CardComponent = LastTwoBoloSpecial;
+    break;
+
+  case "PlayMoreEarnMoreBolo":
+    CardComponent = PlayMoreEarnMoreBolo;
+    break;
+
+  case "NewYorkReal":
+    CardComponent = NewYorkReal;
+    break;
+
+  default:
+    CardComponent = SimpleBoloCard;
+    break;
+}
+
+export const prerender = false;
+---
+
+<Layout title={title} description={description}>
+    <Hero content={description} slot="hero"></Hero>
+
+    <section class="text-center mb-12 flex w-full gap-4">
+        <h2 class="text-3xl lg:text-4xl ml-auto font-bold text-primary-900 dark:text-white">
+            Resultados
+        </h2>
+
+        <input id="input-dte" type="date" value={dt} class="px-4 py-2 mr-auto rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 shadow-sm transition duration-200 [color-scheme:light] dark:[color-scheme:dark]" />
+    </section>
+
+    <section class="flex w-full justify-center">
+        {result ? <CardComponent game={game.data} result={result} /> : <NoResult game={game.data} eventTime={`${dt}T00:00:00-04:00`} />}
+    </section>
+</Layout>
+
+<style>
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    color: white;
+    cursor: pointer;
+  }
+</style>
+
+<script>
+  const inputDte = document.getElementById('input-dte') as HTMLInputElement;
+
+  inputDte?.addEventListener("change", (event) => {
+    const value = (event.target as HTMLInputElement).value;
+    const url = new URL(window.location.href);
+    
+    if (value) {
+      url.searchParams.set("date", value);
+    } else {
+      url.searchParams.delete("date");
+    }
+
+    window.location.href = url.toString();
+  });
+</script>

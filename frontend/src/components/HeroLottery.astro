@@ -1,0 +1,23 @@
+---
+import type { CollectionEntry } from "astro:content";
+import Hero from "./Hero.astro";
+import { getCollection } from "astro:content";
+import { Image } from "astro:assets";
+
+interface Props {
+  lottery: CollectionEntry<"lotteries">;
+}
+
+const { lottery } = Astro.props;
+
+const logos: Record<string, any> = import.meta.glob('@/assets/lotteries/*.png', { eager: true });
+const logoSrc = logos[`/src/assets/lotteries/${lottery.id}.png`]?.default;
+
+const games = await getCollection("games", (game) => game.data.lotteryId.id === lottery.id);
+
+const content = `Consulta los últimos resultados de la ${lottery.data.name}. Información actualizada, confiable y al instante.`;
+---
+
+<Hero content={content} footer={{ label: "Sorteos", count: games.length }}>
+    {logoSrc && <Image src={logoSrc} alt={`${lottery.data.name} Logo`} class="max-h-32 max-w-full h-auto w-auto object-contain mx-auto" />}
+</Hero>

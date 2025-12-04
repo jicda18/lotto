@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Lottery {
+  id String @id @db.Uuid
+  name String
+  slug String @unique
+  logo String?
+  location String?
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  deletedAt DateTime? @db.Timestamptz(3)
+
+  games Game[]
+
+  @@index([deletedAt])
+  @@map("lotteries")
+}
+
+model Game {
+  id String @id @db.Uuid
+  lotteryId String @db.Uuid
+  name String
+  slug String @unique
+  logo String?
+  wrapRepository String
+  options Json
+  resultTime String
+  resultRenderComponent String @default("SimpleBoloCard")
+  resultLength Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  deletedAt DateTime? @db.Timestamptz(3)
+
+  lottery Lottery @relation(fields: [lotteryId], references: [id])
+  results Result[]
+
+  @@index([deletedAt])
+  @@map("games")
+}
+
+model Result {
+  gameId String @db.Uuid
+  eventTime DateTime @db.Timestamptz(3)
+  position Int
+  result String
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  deletedAt DateTime? @db.Timestamptz(3)
+
+  game Game @relation(fields: [gameId], references: [id])
+
+  @@id([gameId, eventTime, position])
+  @@index([gameId])
+  @@index([eventTime])
+  @@index([deletedAt])
+  @@map("results")
+}

@@ -1,0 +1,178 @@
+services:
+  db:
+    image: "postgres:17.5"
+    container_name: lotto-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    ports:
+      - "${FORWARD_DB_PORT:-5432}:5432"
+    restart: unless-stopped
+    networks:
+      - lotto
+  redis:
+    image: "redis:alpine"
+    container_name: lotto-redis
+    volumes:
+      - "./redisdata:/data"
+    restart: unless-stopped
+    networks:
+      - lotto
+  chromium:
+    image: browserless/chrome:latest
+    container_name: lotto-chromium
+    environment:
+      - CONNECTION_TIMEOUT=60000
+      - MAX_CONCURRENT_SESSIONS=8
+    restart: unless-stopped
+    networks:
+      - lotto
+  oapi:
+    build:
+      context: ./oapi
+      dockerfile: Dockerfile
+      args:
+        APP_UID: ${APP_UID}
+        APP_GID: ${APP_GID}
+    image: lotto-oapi:1.0.0
+    container_name: lotto-oapi
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}"
+      SELF_URL: "https://lotto.local/oapi"
+      ORIGIN: "https://lotto.local"
+    depends_on:
+      - db
+    volumes:
+      - ./oapi/logs:/app/logs
+      - ./oapi/prisma:/app/prisma
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.oapi.rule=Host(`lotto.local`) && PathPrefix(`/oapi`)"
+      - "traefik.http.routers.oapi.priority=2"
+      - "traefik.http.routers.oapi.service=oapi-service"
+      - "traefik.http.middlewares.oapi-stripprefix.stripprefix.prefixes=/oapi"
+      - "traefik.http.routers.oapi.middlewares=oapi-stripprefix"
+      - "traefik.http.routers.oapi.tls.certresolver=letsencrypt"
+      - "traefik.http.services.oapi-service.loadbalancer.server.port=3000"
+    networks:
+      - lotto
+  scrapper:
+    build:
+      context: ./scrapper
+      dockerfile: Dockerfile
+      args:
+        APP_UID: ${APP_UID}
+        APP_GID: ${APP_GID}
+    image: lotto-scrapper:1.0.0
+    container_name: lotto-scrapper
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}"
+      BROWSERLESS_WS_ENDPOINT: "ws://chromium:3000"
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      MAIN_QUEUE_NAME: GAME_SEARCH_QUEUE
+      SUB_QUEUE_NAME: BACKGROUND_SEARCH_QUEUE
+      QUEUE_CONCURRENCY: 4
+      EVENT_NAME: ${RESULTS_READY_EVENT_NAME}
+    depends_on:
+      - db
+      - redis
+      - chromium
+    volumes:
+      - ./scrapper/logs:/app/logs
+    networks:
+      - lotto
+  imaker:
+    build:
+      context: ./imaker
+      dockerfile: Dockerfile
+      args:
+        APP_UID: ${APP_UID}
+        APP_GID: ${APP_GID}
+    image: lotto-imaker:1.0.0
+    container_name: lotto-imaker
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      EVENT_NAME: ${RESULTS_READY_EVENT_NAME}
+      PUBLISHER_EVENT_NAME: ${IMAGE_RESULTS_EVENT_NAME}
+      OAPI_BASE_URL: "http://oapi:3000"
+      AWS_ENDPOINT: ${AWS_ENDPOINT}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET}
+      TENANT_ID: ${TENANT_ID}
+    depends_on:
+      - redis
+      - oapi
+    volumes:
+      - ./imaker/logs:/app/logs
+    networks:
+      - lotto
+  snpublisher:
+    build:
+      context: ./snpublisher
+      dockerfile: Dockerfile
+      args:
+        APP_UID: ${APP_UID}
+        APP_GID: ${APP_GID}
+    image: lotto-snpublisher:1.0.0
+    container_name: lotto-snpublisher
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      EVENT_NAME: ${IMAGE_RESULTS_EVENT_NAME}
+      OAPI_BASE_URL: "http://oapi:3000"
+      META_APP_ID: ${META_APP_ID}
+      META_APP_SECRET: ${META_APP_SECRET}
+      META_VERSION: ${META_VERSION}
+      FB_PAGE_TOKEN: ${FB_PAGE_TOKEN}
+      FB_PAGE_ID: ${FB_PAGE_ID}
+    depends_on:
+      - redis
+      - oapi
+    volumes:
+      - ./snpublisher/logs:/app/logs
+    networks:
+      - lotto
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        APP_UID: ${APP_UID}
+        APP_GID: ${APP_GID}
+    image: lotto-frontend:1.0.0
+    container_name: lotto-frontend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      VITE_OAPI_URL: http://oapi:3000
+    depends_on:
+      - oapi
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`lotto.local`)"
+      - "traefik.http.routers.frontend.priority=1"
+      - "traefik.http.routers.frontend.service=frontend-service"
+      - "traefik.http.middlewares.frontend-stripprefix.stripprefix.prefixes=/"
+      - "traefik.http.routers.frontend.middlewares=frontend-stripprefix"
+      - "traefik.http.routers.frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.frontend-service.loadbalancer.server.port=4321"
+    networks:
+      - lotto
+networks:
+  lotto:
+    external: true

@@ -1,0 +1,19 @@
+*.log
+
+node_modules
+dist
+coverage
+*.local
+
+.env
+
+# Editor directories and files
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.qodo
+

@@ -1,0 +1,33 @@
+---
+import type { InferEntrySchema } from 'astro:content';
+import type { Result } from '../../types/result'
+import BaseCard from './BaseCard.astro';
+
+interface Props {
+    result: Result;
+    game: InferEntrySchema<"games">;
+}
+
+const { result, game } = Astro.props;
+
+const color = result.results.at(-1);
+const results =  result.results.slice(0, -1);
+---
+
+<BaseCard id={game.id} name={game.name} eventTime={new Date(result.eventTime)}>
+             {results.map(num => (
+                <span class="flex items-center justify-center w-12 h-12 bg-linear-to-br from-primary-100 via-primary-700 to-primary-900 dark:from-gray-100 dark:via-gray-200 dark:to-gray-500 text-white dark:text-primary-900 rounded-full font-bold text-lg shadow-sm">
+                    {num.toString().padStart(2, '0')}
+                </span>
+            ))}
+
+            {color && <span class="flex items-center justify-center w-12 h-12 p-1 bg-linear-to-br from-gray-100 via-gray-200 to-gray-400 rounded-full font-bold text-lg shadow-sm" class:list={{
+                    "text-red-500": color === 'Roja',
+                    "text-green-500": color === 'Verde',
+                    "text-yellow-500": color === 'Amarilla',
+                }}>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" fill="currentColor">
+                    <path d="M320 176C311.2 176 304 168.8 304 160L304 144C304 99.8 339.8 64 384 64L400 64C408.8 64 416 71.2 416 80L416 96C416 140.2 380.2 176 336 176L320 176zM96 352C96 275.7 131.7 192 208 192C235.3 192 267.7 202.3 290.7 211.3C309.5 218.6 330.6 218.6 349.4 211.3C372.3 202.4 404.8 192 432.1 192C508.4 192 544.1 275.7 544.1 352C544.1 480 464.1 576 384.1 576C367.6 576 346 569.4 332.6 564.7C324.5 561.9 315.7 561.9 307.6 564.7C294.2 569.4 272.6 576 256.1 576C176.1 576 96.1 480 96.1 352z"/>
+                </svg>
+            </span>}
+</BaseCard>

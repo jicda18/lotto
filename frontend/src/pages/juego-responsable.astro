@@ -1,0 +1,61 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+const title = "Juega con Responsabilidad";
+const description="Nuestro objetivo principal es ofrecer información transparente, confiable y actualizada sobre los resultados ganadores de los distintos sorteos.";
+---
+
+<Layout title={title} description={description}>
+    <div slot="hero">
+        <h1 class="text-lg font-semibold">Juega con Responsabilidad</h1>
+        <p class="text-sm text-gray-100">Información y resultados ganadores</p>
+    </div>
+
+    <main class="max-w-6xl mx-auto px-4 py-8 space-y-8">
+        <section class="bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-2xl shadow p-6 lg:flex lg:items-center lg:justify-between">
+            <div>
+                <h2 class="text-xl font-semibold">Nuestra Prioridad</h2>
+                
+                <p class="mt-2">
+                    Nuestro objetivo principal es ofrecer información transparente, confiable y actualizada sobre los resultados ganadores de los distintos sorteos. No organizamos, gestionamos ni estamos afiliados a ninguna lotería, casa de apuestas o entidad relacionada con juegos de azar; nuestra función es únicamente informativa.
+                </p>
+
+                <p class="mt-2">
+                    Creemos firmemente que el juego debe ser considerado una forma de entretenimiento y nunca una herramienta para obtener ingresos o resolver problemas económicos. Si en algún momento sientes que el juego deja de ser una actividad recreativa y comienza a afectar tus finanzas, tu salud emocional o tus relaciones personales, te recomendamos buscar ayuda profesional de inmediato. Jugar con responsabilidad es la mejor manera de mantener una experiencia segura y saludable.
+                </p>
+            </div>
+        </section>
+
+        <!-- Reglas (10 Reglas de Oro) -->
+        <section id="reglas" class="bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 p-6 rounded-2xl shadow">
+            <h3 class="text-xl font-semibold">Las 10 Reglas de Oro del Juego Responsable</h3>
+            <ol class="mt-4 pl-8 list-decimal list-inside space-y-2">
+                <li>Apuesta siempre por diversión, nunca por dinero.</li>
+                <li>Piensa en tus ganancias como un bono y en pérdidas como el costo del entretenimiento.</li>
+                <li>Establece y respeta límites de tiempo y dinero.</li>
+                <li>Mantén un sistema de bankroll y no apuestes más de lo que puedes permitirte.</li>
+                <li>Prepárate para ganar y perder; ambas son partes del juego.</li>
+                <li>Sé atento a síntomas de un problema de juego.</li>
+                <li>Nunca apuestes dinero que no puedes permitirte perder.</li>
+                <li>Pon familia, trabajo y salud antes que el juego.</li>
+                <li>No intentes recuperar pérdidas con apuestas impulsivas.</li>
+                <li>Si deja de ser divertido, aléjate hasta reevaluar la situación.</li>
+            </ol>
+        </section>
+
+        <!-- Señales de adicción y recursos -->
+        <section id="ayuda" class="bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 p-6 rounded-2xl shadow">
+            <h3 class="text-xl font-semibold">Señales de una posible adicción y recursos</h3>
+        
+            <p class="mt-3">Responde honestamente: si contestas "sí" a alguna, considera buscar ayuda.</p>
+
+            <ol class="mt-4 pl-8 list-decimal list-inside">
+                <li>¿Juegas más que compartir tiempo con amigos o familia?</li>
+                <li>¿Pierdes más dinero del que puedes permitirte?</li>
+                <li>¿Depositas grandes sumas buscando la emoción?</li>
+                <li>¿Apuestas para recuperar pérdidas anteriores?</li>
+                <li>¿Tu juego causa estrés, ansiedad o dificultades financieras?</li>
+            </ol>
+        </section>
+  </main>
+</Layout>

@@ -1,0 +1,69 @@
+---
+import Layout from '../layouts/Layout.astro';
+import HeroIndex from '../components/HeroIndex.astro';
+import { getCollection } from 'astro:content';
+import { ArrayHelper } from '../helpers';
+import HrefCard from '../components/HrefCard.astro';
+
+const lotteries = await getCollection('lotteries');
+const logos: Record<string, any> = import.meta.glob('@/assets/lotteries/*.png', { eager: true });
+
+const locations = {
+  DO: "Loterías Dominicanas",
+  US: "Loterías de Estados Unidos",
+  ES: "Loterías de España",
+  HT: "Loterías de Haití",
+};
+
+const groupedLotteries = lotteries.reduce((acc, lottery) => {
+  const country = lottery.data.location || '';
+
+  if (!acc[country]) acc[country] = [];
+
+  acc[country].push(lottery);
+
+  return acc;
+}, {} as Record<string, typeof lotteries>);
+
+const lotteriesDescriptions = Object.entries(groupedLotteries).map(([country, lotteries]) => {
+  const location = locations[country as keyof typeof locations] || "Loterías Internacionales";
+
+  const lotteryNames = ArrayHelper.join(lotteries.map((lottery) => lottery.data.name), ", ", " y ");
+
+  return `las ${location} como ${lotteryNames}`;
+});
+
+const title = 'Resultados de Loterías';
+const description = `Consulta los información actualizada, confiable y al instante de los últimos resultados de ${ArrayHelper.join(lotteriesDescriptions, ", ", " y ")}.`;
+---
+
+<Layout title={title} description={description}>
+  <HeroIndex slot="hero" />
+  
+  <section class="text-center mb-12">
+    <h2 class="text-3xl lg:text-4xl font-bold text-primary-900 dark:text-white mb-4">
+      Loterías
+    </h2>
+    <p class="text-xl text-gray-600 dark:text-gray-300 mb-6 text-justify">
+      Descubre al instante los <strong>resultados de la lotería más recientes</strong> y mantente siempre informado con datos confiables, claros y actualizados.
+      Aquí encontrarás los números ganadores de tus sorteos favoritos, con una presentación rápida y sencilla que te permitirá verificar tus boletos sin complicaciones.
+      Ya sea que busques resultados de la Lotería Nacional, Quinielas, o sorteos especiales, este es el lugar ideal para acceder a la información de manera segura.
+      ¡Consulta ahora los resultados y vive la emoción de saber si la suerte estuvo de tu lado!
+    </p>
+  </section>
+  
+  <section class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    {lotteries.map(lottery => {
+      const href = `/lotteries/${lottery.data.slug}`;
+      const logo = logos[`/src/assets/lotteries/${lottery.id}.png`]?.default;
+
+      return <HrefCard 
+        id={lottery.id}
+        name={lottery.data.name}
+        href={href}
+        logo={logo}>
+          <p>Consulta los resultados de la <strong>{lottery.data.name}</strong> y descubre los números ganadores de sus sorteos.</p>
+      </HrefCard>;
+    })}
+  </section>
+</Layout>

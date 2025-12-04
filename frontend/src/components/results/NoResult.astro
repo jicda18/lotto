@@ -1,0 +1,19 @@
+---
+import type { InferEntrySchema } from 'astro:content';
+import BaseCard from './BaseCard.astro';
+
+interface Props {
+    game: InferEntrySchema<"games">;
+    eventTime: string;
+}
+
+const { game, eventTime } = Astro.props; 
+
+console.log(eventTime);
+---
+
+<BaseCard id={game.id} name={game.name} eventTime={new Date(eventTime)}>
+    <p class="text-center text-primary-900 dark:text-white font-bold text-lg">
+        Resultados no disponibles para esta fecha.
+    </p>
+</BaseCard>

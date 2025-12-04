@@ -1,0 +1,43 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../layouts/Layout.astro";
+
+const title = "Sobre Nosotros";
+const description="Lotto.local es una plataforma digital especializada en la publicación de resultados de loterías nacionales e internacionales.";
+
+const lotteries = await getCollection("lotteries");
+---
+
+<Layout title={title} description={description}>
+    <div slot="hero">
+        <h1 class="text-lg font-semibold">Lotto</h1>
+    </div>
+
+    <main class="max-w-6xl mx-auto px-4 py-8 space-y-8">
+        <section class="bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-2xl shadow p-6 lg:flex lg:items-center lg:justify-between">
+            <div>
+                <h2 class="text-xl font-semibold">Sobre Nosotros</h2>
+
+                <p class="mt-2">
+                    <strong>Lotto.local</strong> es una plataforma digital especializada en la publicación de resultados de loterías nacionales e internacionales, con un enfoque principal en las loterías de la República Dominicana. Hacemos nuestro mejor esfuerzos para ofrecer información confiable, actualizada y accesible a todos nuestros usuarios.
+                </p>
+
+                <p class="mt-2">
+                    En Lotto.local no comercializamos ni promovemos sorteos de loterías. Nuestro propósito es únicamente informativo: proporcionar a los usuarios acceso rápido y preciso a los resultados oficiales, junto con información educativa sobre cada sorteo.
+                </p>
+
+                <p class="mt-2">
+                    Actualmente, publicamos los resultados de las loterías:
+
+                    <ul class="mt-4 pl-8 list-decimal list-inside space-y-2">
+                        {lotteries.map((lottery) => <li class="font-bold">{lottery.data.name}</li>)}
+                    </ul>
+                </p>
+
+                <p class="mt-2">
+                    En Lotto.local trabajamos cada día para mejorar la precisión, velocidad y accesibilidad de la información, brindando a nuestros usuarios una experiencia transparente, moderna y segura.
+                </p>
+            </div>
+        </section>
+    </main>
+</Layout>

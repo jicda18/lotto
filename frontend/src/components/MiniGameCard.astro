@@ -1,0 +1,23 @@
+---
+interface Props {
+    id: string;
+  name: string;
+  href?: string;
+  logo?: string;
+}
+
+const { 
+  name, 
+  id,
+  href,
+  logo,
+} = Astro.props;
+
+const CardWrapper = href ? 'a' : 'article';
+---
+
+<CardWrapper class="flex w-content" id={id} href={href}>
+    <img src={logo} class="w-8" /> <!-- Change to Astro image component -->
+    
+    <h3>{name}</h3>
+</CardWrapper>

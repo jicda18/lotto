@@ -1,0 +1,30 @@
+---
+interface Props {
+    content: string;
+    footer?: {
+        label: string;
+        count: number;
+    } 
+}
+
+const { content, footer } = Astro.props;
+---
+
+<slot />
+
+<p class="text-xl lg:text-2xl text-blue-100 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed" class:list={{'pb-12': !!footer}}>{content}</p>
+
+{footer && <div class="flex flex-wrap justify-center gap-8 lg:gap-12">
+  <div class="text-center animate-slide-up">
+    <div class="text-3xl lg:text-4xl font-bold text-gold-400 dark:text-gold-300 mb-2">{footer.count}</div>
+    <div class="text-sm lg:text-base text-blue-200 dark:text-gray-400 uppercase tracking-wide">{footer.label}</div>
+  </div>
+  <div class="text-center animate-slide-up" style="animation-delay: 0.1s;">
+    <div class="text-3xl lg:text-4xl font-bold text-gold-400 dark:text-gold-300 mb-2">24/7</div>
+    <div class="text-sm lg:text-base text-blue-200 dark:text-gray-400 uppercase tracking-wide">Actualizado</div>
+  </div>
+  <div class="text-center animate-slide-up" style="animation-delay: 0.2s;">
+    <div class="text-3xl lg:text-4xl font-bold text-gold-400 dark:text-gold-300 mb-2">100%</div>
+    <div class="text-sm lg:text-base text-blue-200 dark:text-gray-400 uppercase tracking-wide">Confiable</div>
+  </div>
+</div> }

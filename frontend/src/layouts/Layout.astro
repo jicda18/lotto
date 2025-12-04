@@ -1,0 +1,98 @@
+---
+import Analytics from '../components/Analytics.astro';
+import CookieConsent from '../components/CookieConsent.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import '../styles/global.css';
+
+export interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  canonical?: string;
+}
+
+const { 
+  title, 
+  description, 
+  image = '/og-image.png',
+  canonical
+} = Astro.props;
+
+const siteUrl = Astro.site?.toString() || 'https://lotto.local';
+const canonicalUrl = canonical || Astro.url.toString();
+---
+
+<!doctype html>
+<html lang="es" class="scroll-smooth" id="html-root">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/icon.png" />
+    <meta name="generator" content={Astro.generator} />
+    
+    <!-- SEO Meta Tags -->
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL(image, siteUrl).toString()} />
+    <meta property="og:site_name" content="lotto" />
+    <meta property="og:locale" content="es" />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={canonicalUrl} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={new URL(image, siteUrl).toString()} />
+    
+    <!-- Additional SEO -->
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="Cruxys" />
+    <meta name="language" content="Spanish" />
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <Analytics />
+  </head>
+  <body class="min-h-screen bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-sans antialiased transition-colors duration-300">
+    <Header />
+
+    {Astro.slots.has("hero") && <section class="bg-linear-to-br from-primary-400 via-primary-600 to-primary-800 dark:from-gray-700 dark:via-gray-800 dark:to-gray-900 text-white py-8">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div class="animate-fade-in">
+          <slot name="hero" />
+        </div>
+      </div>
+    </section> }
+    
+    <main class="py-16">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <slot />
+      </div>
+    </main>
+
+    <Footer />
+
+    <!-- Dark Mode Script -->
+    <script>
+      const theme = localStorage.getItem('theme');
+      const html = document.getElementById('html-root');
+      
+      if (theme === 'dark') {
+        html?.classList.add('dark');
+      }
+    </script>
+
+    <CookieConsent />
+  </body>
+</html>

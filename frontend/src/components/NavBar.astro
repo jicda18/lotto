@@ -1,0 +1,71 @@
+---
+import MoonIcon from '../icons/MoonIcon.astro';
+import SunIcon from '../icons/SunIcon.astro';
+
+type NavItem = { path: string; label: string; children?: undefined };
+interface Props {
+    items: (NavItem | { path?: undefined; label: string; children: NavItem[] })[]
+}
+
+const { items } = Astro.props;
+const currentPath = Astro.url.pathname;
+---
+
+<ul class="hidden md:flex items-center space-x-8">
+    {items.map((item) => <li class:list={{ 'relative group': !!item.children?.length }}>
+        {!item.children?.length ? (
+            <a
+                href={item.path}
+                class:list={`font-medium transition-colors ${currentPath === item.path ? 'text-primary-900 border-b-2 border-gold-500 pb-1 dark:text-white' : 'text-gray-600 hover:text-primary-900 dark:text-gray-300'}`}
+            >
+                { item.label }
+            </a>
+        ) : (
+            <button
+                id={`${item.label.replace(' ', '-')}-dropdown-button`}
+                class={`font-medium transition-colors flex items-center gap-1 ${item.children?.map((child) => child.path).includes(currentPath) ? 'text-primary-900 border-b-2 border-gold-500 pb-1 dark:text-white' : 'text-gray-600 hover:text-primary-900 dark:text-gray-300'}`}
+            >
+                { item.label }
+                <svg class="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+            </button>
+            <div
+                id={`${item.label.replace(' ', '-')}-dropdown`}
+                class="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50"
+            >
+                <div class="py-2">
+                    {item.children?.map((child) => <a href={child.path} class="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-primary-900 dark:hover:text-primary-400 transition-colors">{ child.label }</a>)}
+                </div>
+            </div>
+        )}
+    </li>)}
+</ul>
+
+ <!-- Dark Mode Toggle -->
+<button 
+    id="theme-toggle"
+    class="hidden md:block p-2 rounded-md text-gray-600 dark:text-gray-300 hover:text-primary-900 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+    aria-label="Cambiar tema"
+    >
+    <SunIcon id="sun-icon" class="w-5 h-5 hidden dark:block" />
+    
+    <MoonIcon id="moon-icon" class="w-5 h-5 block dark:hidden" />
+    </button>
+</nav>
+
+<script>
+  const themeToggle = document.getElementById('theme-toggle');
+  
+  themeToggle?.addEventListener('click', () => {
+    const html = document.getElementById('html-root');
+    
+    html?.classList.toggle("dark");
+
+    if (html?.classList.contains("dark")) {
+        localStorage.setItem("theme", "dark");
+    } else {
+        localStorage.setItem("theme", "light");
+    }
+  });
+</script>

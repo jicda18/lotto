@@ -1,0 +1,42 @@
+---
+import { Image } from 'astro:assets';
+
+interface Props {
+    id: string;
+    eventTime: Date;
+    name: string;
+}
+
+const { id, eventTime, name } = Astro.props;
+
+const logos: Record<string, any> = import.meta.glob('@/assets/games/*.png', { eager: true });
+const logo = logos[`/src/assets/games/${id}.png`]?.default;
+---
+
+<div class="w-128 max-w-full bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-200 dark:border-gray-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
+    <header class="flex flex-col justify-center mb-6">
+        {logo && <Image src={logo} alt={`${name} Logo`} class="max-h-16 max-w-full h-auto w-auto object-contain" /> }
+
+        <h2 class="text-center text-2xl font-semibold text-primary-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors">
+            {name}
+        </h2>
+        
+        <time 
+            datetime={eventTime.toISOString()} 
+            class="text-sm text-center text-gray-500 dark:text-gray-300 font-medium px-3 py-1 rounded-full capitalize"
+        >
+            {eventTime.toLocaleDateString('es', { 
+                weekday: 'short', 
+                day: 'numeric',
+                month: 'short',
+                year: "numeric",
+            })}
+        </time>
+    </header>
+
+    <div class="space-y-4 mb-6">
+        <div class="flex flex-wrap gap-2 justify-center">
+            <slot />
+        </div>
+    </div>
+</div>

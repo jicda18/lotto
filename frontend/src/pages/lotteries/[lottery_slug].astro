@@ -1,0 +1,65 @@
+---
+import type { GetStaticPaths } from "astro";
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import HrefCard from "../../components/HrefCard.astro";
+import HeroLottery from "../../components/HeroLottery.astro";
+import { getEntry } from "astro:content";
+import { ArrayHelper } from "../../helpers";
+
+export const getStaticPaths = (async () => {
+    const lotteries = await getCollection('lotteries');
+    
+    return lotteries.map((lottery) => ({
+        params: { lottery_slug: lottery.data.slug },
+        props: { lottery: lottery  },
+    }));
+}) satisfies GetStaticPaths;
+
+const { lottery } = Astro.props;
+const games = await getCollection("games", (game) => game.data.lotteryId.id === lottery.id);
+const lotteryDescription = await getEntry('lotteriesDescriptions', lottery.data.slug);
+const logos: Record<string, any> = import.meta.glob('@/assets/games/*.png', { eager: true });
+
+const title = `Resultados de ${lottery.data.name}`;
+const description = `Consulta los últimos resultados de ${lottery.data.name}.`;
+---
+
+<Layout title={title} description={description}>
+    <HeroLottery lottery={lottery} slot="hero"></HeroLottery>
+    
+    <section class="text-center mb-12">
+        <h2 class="text-3xl lg:text-4xl font-bold text-primary-900 dark:text-white mb-4">
+            Sorteos
+        </h2>
+        <p class="text-xl text-gray-600 dark:text-gray-300 mb-6 text-justify">
+            Descubre al instante los <strong>resultados de los sorteos más recientes de {lottery.data.name}</strong> y mantente siempre informado con datos confiables, claros y actualizados.
+            Aquí encontrarás los números ganadores de los sorteos de {lottery.data.name}, con una presentación rápida y sencilla que te permitirá verificar tus boletos sin complicaciones.
+            ¡Consulta ahora los resultados y vive la emoción de saber si la suerte estuvo de tu lado!
+        </p>
+    </section>
+
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-32">
+      {games.map(game => {
+        const href = `/lotteries/${lottery.data.slug}/games/${game.data.slug}`;
+        const logo = logos[`/src/assets/games/${game.id}.png`]?.default;
+
+        return <HrefCard
+          id={game.id}
+          name={game.data.name}
+          href={href}
+          logo={logo}>
+            <p>Descubre los ultimos resultados ganadores de el sorteo <strong>{game.data.name}</strong>.</p>
+        </HrefCard>;
+      })}
+  </section>
+
+  {lotteryDescription && <section class="text-center">
+        <h2 class="text-3xl lg:text-4xl font-bold text-primary-900 dark:text-white mb-4">
+            {lottery.data.name} Resultados
+        </h2>
+        <p class="text-xl text-gray-600 dark:text-gray-300 mb-6 text-justify">
+            {lotteryDescription.data.description.replace("{{games}}", ArrayHelper.join(games.map((game) => game.data.name), ", ", " y "))}
+        </p>
+    </section>}
+</Layout>

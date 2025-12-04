@@ -1,0 +1,37 @@
+services:
+  db:
+    image: "postgres:17.5"
+    container_name: lotto-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${FORWARD_DB_PORT:-5432}:5432"
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    networks:
+      - lotto
+  redis:
+    image: "redis:alpine"
+    container_name: lotto-redis
+    ports:
+      - "${FORWARD_REDIS_PORT:-6379}:6379"
+    volumes:
+      - "./redisdata:/data"
+    networks:
+      - lotto
+
+  chromium:
+    image: browserless/chrome:latest
+    container_name: lotto-chromium
+    ports:
+      - "${FORWARD_BROWSERLESS_PORT:-3000}:3000"
+    environment:
+      - CONNECTION_TIMEOUT=60000
+      - MAX_CONCURRENT_SESSIONS=8
+    networks:
+      - lotto
+networks:
+  lotto:
+    driver: bridge

@@ -1,0 +1,35 @@
+---
+import { Image } from 'astro:assets';
+
+export interface Props {
+  id: string;
+  name: string;
+  href: string;
+  logo?: any;
+}
+
+const { id, name, href, logo } = Astro.props;
+---
+
+<a 
+  class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group"
+  id={id}
+  href={href}
+>
+    <header class="flex justify-between items-start mb-6">
+        <h2 class="text-2xl font-semibold text-primary-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors">
+            {name}
+        </h2>
+    </header>
+
+    <div class="space-y-4 mb-6">
+        <div class="flex flex-wrap gap-2 justify-center">
+            {logo && <Image src={logo} alt={`${name} Logo`} class="max-h-32 max-w-full h-auto w-auto object-contain" /> }
+        </div>
+    </div>
+
+
+    <div class="border-t border-gray-100 dark:border-gray-700 pt-4 gap-4">
+        <slot/>
+    </div>
+</a>

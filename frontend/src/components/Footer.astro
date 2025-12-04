@@ -1,0 +1,57 @@
+---
+import icon from "@/assets/icon.png";
+import { Image } from "astro:assets";
+import { getCollection } from "astro:content";
+
+const lotteries = await getCollection('lotteries');
+---
+
+<footer class="bg-primary-700 dark:bg-primary-900 text-white py-12 mt-16">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+      <div>
+        <div class="flex items-center space-x-1 mb-4">
+          <Image src={icon} alt="Lotto icon" class="h-16 w-16 flex-shrink-0" />
+          <span class="text-3xl font-bold">Lotto</span>
+        </div>
+        <p class="text-white leading-relaxed max-w-md">
+          Tu fuente confiable para los resultados más actualizados de las principales loterías.
+        </p>
+      </div>
+      
+      <div>
+        <h4 class="text-gold-400 font-semibold mb-4">Loterías</h4>
+        <ul class="space-y-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3">
+          {lotteries.map((lottery) => <li><a href={`/lotteries/${lottery.data.slug}`} class="text-white hover:text-gold-300 transition-colors">{lottery.data.name}</a></li>)}
+        </ul>
+      </div>
+    </div>
+    
+    <div class="border-t border-primary-800 pt-8 text-center">
+      <p class="text-white text-sm mb-2">
+        &copy; 2025 Josue Cruz. Todos los derechos reservados.
+      </p>
+      <p class="text-gray-300 text-xs italic">
+        Esta página es únicamente informativa. No somos organizadores de ninguna lotería. La información sobre resultados tiene carácter informativo.
+      </p>
+    </div>
+
+    <ul class="flex justify-center gap-8 mt-8">
+      <li>
+        <a href="/sobre-nosotros" class="text-white hover:text-gold-300 transition-colors">Sobre Nosotros</a>
+      </li>
+      
+      <li>
+        <a href="/juego-responsable" class="text-white hover:text-gold-300 transition-colors">Juega con responsabilidad</a>
+      </li>
+      
+      <li>
+        <a href="/termino-condiciones" class="text-white hover:text-gold-300 transition-colors">Términos y Condiciones</a>
+      </li>
+
+      <li>
+        <a href="/politica-privacidad" class="text-white hover:text-gold-300 transition-colors">Política de Privacidad</a>
+      </li>
+    </ul>
+  </div>
+</footer>

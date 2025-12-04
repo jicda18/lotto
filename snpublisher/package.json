@@ -1,0 +1,33 @@
+{
+  "name": "lotto-snpublicher",
+  "private": true,
+  "version": "0.0.0",
+  "author": "Cruxys",
+  "contributors": [
+    {
+      "name": "Josue Cruz",
+      "email": "jicda18@outlook.com"
+    }
+  ],
+  "scripts": {
+    "dev": "tsnd --respawn --clear src/app.ts",
+    "build": "rimraf ./dist && tsc",
+    "start": "node dist/app.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "env-var": "^7.5.0",
+    "ioredis": "^5.8.2",
+    "luxon": "^3.7.2",
+    "twitter-api-v2": "^1.28.0",
+    "winston": "^3.18.3"
+  },
+  "devDependencies": {
+    "@types/luxon": "^3.7.1",
+    "@types/node": "^24.10.1",
+    "rimraf": "^6.1.2",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.9.3"
+  }
+}

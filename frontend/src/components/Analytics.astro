@@ -1,0 +1,23 @@
+---
+const isProd = import.meta.env.MODE === "production";
+---
+
+{isProd && (
+  <>
+    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-3EM4V5ZT6T"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag("consent", "default", {
+        ad_storage: "denied",
+        ad_user_data: "denied",
+        ad_personalization: "denied",
+        analytics_storage: "denied",
+      });
+
+      gtag('config', 'G-3EM4V5ZT6T');
+    </script>
+  </>
+)}
