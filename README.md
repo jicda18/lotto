@@ -1,14 +1,22 @@
 # Lotto
 
-## ⚙️ Requisitos
+## Production example of results
+
+A production implementation of this project can be viewed at [sorsyx.com](https://sorsyx.com/). This website displays lottery draw results, using the architecture and components developed in this monorepo.
+
+## 🎯 Project Purpose
+
+This project was developed primarily for educational purposes and as a key piece for its creator's portfolio. It serves as a practical demonstration of skills in designing, developing, and deploying complex and scalable applications, exploring software architecture and microservices concepts in a monorepo environment.
+
+## ⚙️ Requirements
 
 - Node.js **v24.11**
 - Yarn
 - Docker
 
-## 🚀 Instalación
+## 🚀 Installation
 
-### 1. Clona el repositorio:
+### 1. Clone the repository:
 
 ```bash
 git clone https://github.com/jicda18/lotto.git
