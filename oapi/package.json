@@ -26,7 +26,7 @@
     "ip": "^2.0.1",
     "luxon": "^3.7.2",
     "uuid": "^11.1.0",
-    "winston": "^3.18.3",
+    "winston": "^3.19.0",
     "yargs": "^18.0.0"
   },
   "devDependencies": {
